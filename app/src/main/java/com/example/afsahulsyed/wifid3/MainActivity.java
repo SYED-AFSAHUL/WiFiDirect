@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Log.d(TAG,"inside OnCreate - main Activity");
         initView();
         initIntentFilter();
         initReceiver();
@@ -54,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initView() {
+        Log.d(TAG,"inside initView");
         discoverBT = (Button) findViewById(R.id.button);
         connectBT = (Button)findViewById(R.id.button2);
         sendDataBT = (Button)findViewById(R.id.buttonC);
@@ -61,9 +63,11 @@ public class MainActivity extends AppCompatActivity {
         deviceNoNP = (NumberPicker)findViewById(R.id.numberPicker);
         deviceNoNP.setMinValue(1);
         deviceNoNP.setWrapSelectorWheel(true);
+        Log.d(TAG,"exit initView");
     }
 
     private void initIntentFilter() {
+        Log.d(TAG,"inside initIntentFilter");
         mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
@@ -73,19 +77,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initReceiver() {
+        Log.d(TAG,"initReceiver");
         mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         mChannel = mManager.initialize(this, getMainLooper(), null);
 
-        WifiP2pManager.PeerListListener mPeerListListerner = new WifiP2pManager.PeerListListener() {
+        WifiP2pManager.PeerListListener mPeerListListener = new WifiP2pManager.PeerListListener() {
             @Override
             public void onPeersAvailable(WifiP2pDeviceList peersList) {
+                Log.d(TAG,"OnPeersAvailable");
                 peers.clear();
                 // peersshow.clear();
                 Collection<WifiP2pDevice> aList = peersList.getDeviceList();
                 peers.addAll(aList);
 
                 deviceNoNP.setMaxValue(aList.size());
-
+                Log.d(TAG,"Device List :- ");
                 for (int i = 0; i < aList.size(); i++) {
                     WifiP2pDevice a = (WifiP2pDevice) peers.get(i);
                     // HashMap<String, String> map = new HashMap<String, String>();
@@ -100,13 +106,14 @@ public class MainActivity extends AppCompatActivity {
         WifiP2pManager.ConnectionInfoListener mInfoListener = new WifiP2pManager.ConnectionInfoListener() {
 
             @Override
-            public void onConnectionInfoAvailable(final WifiP2pInfo minfo) {
+            public void onConnectionInfoAvailable(final WifiP2pInfo mInfo) {
 
-                Log.i("xyz", "InfoAvailable is on");
-                info = minfo;
+                Log.d(TAG, "InfoAvailable is on");
+
+                info = mInfo;
                 TextView view = (TextView) findViewById(R.id.textView);
                 if (info.groupFormed && info.isGroupOwner) {
-                    Log.i("xyz", "owmer start");
+                    Log.d(TAG, "owner start");
 
                    // mServerTask = new FileServerAsyncTask(MainActivity.this, view);
                    // mServerTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -116,11 +123,12 @@ public class MainActivity extends AppCompatActivity {
 
                 } else if (info.groupFormed) {
                     SetButtonVisible();
+                    Log.d(TAG,"group Formed");
                 }
             }
         };
 
-        mReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel,mPeerListListerner,
+        mReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel,mPeerListListener,
                                                         this, mInfoListener);
     }
 
@@ -131,10 +139,11 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void initEvents() {
-
+        Log.d(TAG,"initEvent");
         discoverBT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d(TAG,"discoverBT clicked");
                 DiscoverPeers();
             }
         });
@@ -142,6 +151,7 @@ public class MainActivity extends AppCompatActivity {
         connectBT.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
+                Log.d(TAG,"connectBT clicked");
                 int no = deviceNoNP.getValue();
                 mDevice = (WifiP2pDevice) peers.get(no);
                 CreateConnect(mDevice);
@@ -153,6 +163,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
+                Log.d(TAG,"sendDataBT clicked");
                 Intent serviceIntent = new Intent(MainActivity.this,
                         ClientService.class);
 
@@ -160,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
 
                 serviceIntent.putExtra(ClientService.EXTRAS_GROUP_OWNER_ADDRESS,
                         info.groupOwnerAddress.getHostAddress());
-                Log.i("address", "owenerip is " + info.groupOwnerAddress.getHostAddress());
+                Log.i(TAG, "owenerip is " + info.groupOwnerAddress.getHostAddress());
                 serviceIntent.putExtra(ClientService.EXTRAS_GROUP_OWNER_PORT,
                         8888);
                 MainActivity.this.startService(serviceIntent);
@@ -172,9 +183,11 @@ public class MainActivity extends AppCompatActivity {
         mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
+                Log.d(TAG,"DiscoverPeers Success");
             }
             @Override
             public void onFailure(int reasonCode) {
+                Log.d(TAG,"DiscoverPeers Fail");
             }
         });
     }
