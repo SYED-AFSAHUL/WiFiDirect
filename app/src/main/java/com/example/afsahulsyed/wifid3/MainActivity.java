@@ -2,17 +2,21 @@ package com.example.afsahulsyed.wifid3;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
+import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.NumberPicker;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,14 +25,18 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "sMess";
+    private WifiP2pInfo info;
     WifiP2pManager mManager;
     WifiP2pManager.Channel mChannel;
     BroadcastReceiver mReceiver;
     IntentFilter mIntentFilter;
     WifiP2pDevice mDevice;
+    private ServerService mDataTask;
 
     Button discoverBT;
     Button connectBT;
+    Button sendDataBT;
+    Button receiveDataBT;
     NumberPicker deviceNoNP;
 
     private List peers = new ArrayList();
@@ -48,6 +56,8 @@ public class MainActivity extends AppCompatActivity {
     private void initView() {
         discoverBT = (Button) findViewById(R.id.button);
         connectBT = (Button)findViewById(R.id.button2);
+        sendDataBT = (Button)findViewById(R.id.buttonC);
+        receiveDataBT = (Button)findViewById(R.id.buttonS);
         deviceNoNP = (NumberPicker)findViewById(R.id.numberPicker);
         deviceNoNP.setMinValue(1);
         deviceNoNP.setWrapSelectorWheel(true);
@@ -87,7 +97,36 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        mReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel,mPeerListListerner, this);
+        WifiP2pManager.ConnectionInfoListener mInfoListener = new WifiP2pManager.ConnectionInfoListener() {
+
+            @Override
+            public void onConnectionInfoAvailable(final WifiP2pInfo minfo) {
+
+                Log.i("xyz", "InfoAvailable is on");
+                info = minfo;
+                TextView view = (TextView) findViewById(R.id.textView);
+                if (info.groupFormed && info.isGroupOwner) {
+                    Log.i("xyz", "owmer start");
+
+                   // mServerTask = new FileServerAsyncTask(MainActivity.this, view);
+                   // mServerTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+                    mDataTask = new ServerService(getApplicationContext(), view);
+                    mDataTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+                } else if (info.groupFormed) {
+                    SetButtonVisible();
+                }
+            }
+        };
+
+        mReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel,mPeerListListerner,
+                                                        this, mInfoListener);
+    }
+
+    private void SetButtonVisible() {
+        //sendpicture.setVisibility(View.VISIBLE);
+        sendDataBT.setVisibility(View.VISIBLE);
     }
 
 
@@ -106,6 +145,25 @@ public class MainActivity extends AppCompatActivity {
                 int no = deviceNoNP.getValue();
                 mDevice = (WifiP2pDevice) peers.get(no);
                 CreateConnect(mDevice);
+            }
+        });
+
+        //Client
+        sendDataBT.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                Intent serviceIntent = new Intent(MainActivity.this,
+                        ClientService.class);
+
+                serviceIntent.setAction(ClientService.ACTION_SEND_FILE);
+
+                serviceIntent.putExtra(ClientService.EXTRAS_GROUP_OWNER_ADDRESS,
+                        info.groupOwnerAddress.getHostAddress());
+                Log.i("address", "owenerip is " + info.groupOwnerAddress.getHostAddress());
+                serviceIntent.putExtra(ClientService.EXTRAS_GROUP_OWNER_PORT,
+                        8888);
+                MainActivity.this.startService(serviceIntent);
             }
         });
     }

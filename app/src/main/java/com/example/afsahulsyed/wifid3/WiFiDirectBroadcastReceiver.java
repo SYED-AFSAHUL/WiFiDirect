@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.net.NetworkInfo;
 import android.net.wifi.p2p.WifiP2pManager;
+import android.util.Log;
 
 /**
  * Created by afsahulsyed on 23/5/17.
@@ -15,18 +17,22 @@ import android.net.wifi.p2p.WifiP2pManager;
  */
 
 public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
+    private WifiP2pManager.ConnectionInfoListener mInfoListener;
     private WifiP2pManager mManager;
     private WifiP2pManager.Channel mChannel;
     private Activity mActivity;
     WifiP2pManager.PeerListListener mPeerListListener;
 
     public WiFiDirectBroadcastReceiver(WifiP2pManager manager, WifiP2pManager.Channel channel,
-                                       WifiP2pManager.PeerListListener peerListListener, Activity activity) {
+                                       WifiP2pManager.PeerListListener peerListListener,
+                                       Activity activity,
+                                       WifiP2pManager.ConnectionInfoListener infoListener) {
         super();
         this.mManager = manager;
         this.mChannel = channel;
         this.mPeerListListener = peerListListener;
         this.mActivity = activity;
+        this.mInfoListener = infoListener;
     }
 
     @Override
@@ -50,6 +56,20 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 break;
             case WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION:
                 // Respond to new connection or disconnections
+                if (mManager == null) {
+                    return;
+                }
+
+                NetworkInfo networkInfo = (NetworkInfo) intent
+                        .getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
+
+                if (networkInfo.isConnected()) {
+                    Log.i("xyz", "已连接");
+                    mManager.requestConnectionInfo(mChannel, mInfoListener);
+                } else {
+                    Log.i("xyz", "断开连接");
+                    return;
+                }
                 break;
             case WifiP2pManager.WIFI_P2P_DISCOVERY_CHANGED_ACTION:
 

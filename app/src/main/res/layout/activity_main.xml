@@ -39,4 +39,31 @@
         android:layout_above="@+id/button2"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="81dp" />
+
+    <Button
+        android:id="@+id/buttonC"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SendData-Client"
+        android:layout_alignParentBottom="true"
+        android:layout_toStartOf="@+id/numberPicker"
+        android:layout_marginBottom="25dp" />
+
+    <Button
+        android:id="@+id/buttonS"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="GetData-Server"
+        android:layout_alignBaseline="@+id/buttonC"
+        android:layout_alignBottom="@+id/buttonC"
+        android:layout_toEndOf="@+id/buttonC"
+        android:layout_marginStart="18dp" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/numberPicker"
+        android:layout_alignStart="@+id/buttonC"
+        android:text="TextView" />
 </RelativeLayout>
