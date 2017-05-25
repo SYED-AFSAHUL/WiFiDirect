@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
@@ -34,11 +35,13 @@ public class MainActivity extends AppCompatActivity {
     IntentFilter mIntentFilter;
     WifiP2pDevice mDevice;
     private ServerService mDataTask;
+    private ServerFiles mServerFiles;
 
     Button discoverBT;
     Button connectBT;
     Button sendDataBT;
     Button receiveDataBT;
+    Button sendPicBT;
     NumberPicker deviceNoNP;
 
     private List peers = new ArrayList();
@@ -62,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
         connectBT = (Button)findViewById(R.id.button2);
         sendDataBT = (Button)findViewById(R.id.buttonC);
         receiveDataBT = (Button)findViewById(R.id.buttonS);
+        sendPicBT = (Button)findViewById(R.id.buttonCsP);
         deviceNoNP = (NumberPicker)findViewById(R.id.numberPicker);
         deviceNoNP.setMinValue(1);
         deviceNoNP.setWrapSelectorWheel(true);
@@ -128,8 +132,8 @@ public class MainActivity extends AppCompatActivity {
                 if (info.groupFormed && info.isGroupOwner) {
                     Log.d(TAG, "Group formed and you are the owner");
 
-                   // mServerTask = new FileServerAsyncTask(MainActivity.this, view);
-                   // mServerTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                    mServerFiles = new ServerFiles(MainActivity.this, view);
+                    mServerFiles.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
                     mDataTask = new ServerService(getApplicationContext(), view);
                     mDataTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -176,17 +180,28 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Log.d(TAG,"sendDataBT clicked");
-                Intent serviceIntent = new Intent(MainActivity.this,
-                        ClientService.class);
+
+                Intent serviceIntent = new Intent(MainActivity.this, ClientService.class);
 
                 serviceIntent.setAction(ClientService.ACTION_SEND_FILE);
 
                 serviceIntent.putExtra(ClientService.EXTRAS_GROUP_OWNER_ADDRESS,
                         info.groupOwnerAddress.getHostAddress());
-                Log.i(TAG, "ownership is " + info.groupOwnerAddress.getHostAddress());
-                serviceIntent.putExtra(ClientService.EXTRAS_GROUP_OWNER_PORT,
-                        8888);
+                Log.d(TAG, "ownership is " + info.groupOwnerAddress.getHostAddress());
+                serviceIntent.putExtra(ClientService.EXTRAS_GROUP_OWNER_PORT, 8888);
                 MainActivity.this.startService(serviceIntent);
+            }
+        });
+
+        //client send pictures
+        sendPicBT.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                //intent.setType("image/*");
+                //startActivityForResult(intent, 20);
+                sendPicClient();
+
             }
         });
     }
@@ -225,6 +240,25 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG,"exiting CreateConnection");
     }
 
+    //@Override
+    //protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+       // if (requestCode == 20) {
+         //   super.onActivityResult(requestCode, resultCode, data);
+           // Uri uri = data.getData();
+    private void sendPicClient(){
+            Intent serviceIntent = new Intent(MainActivity.this,
+                    ClientFiles.class);
+
+            serviceIntent.setAction(ClientFiles.ACTION_SEND_FILE);
+            //serviceIntent.putExtra(ClientFiles.EXTRAS_FILE_PATH,
+              //      uri.toString());
+
+            serviceIntent.putExtra(ClientFiles.EXTRAS_GROUP_OWNER_ADDRESS,
+                    info.groupOwnerAddress.getHostAddress());
+            serviceIntent.putExtra(ClientFiles.EXTRAS_GROUP_OWNER_PORT,
+                    8988);
+            MainActivity.this.startService(serviceIntent);
+    }
 
 
     /* register the broadcast receiver with the intent values to be matched */

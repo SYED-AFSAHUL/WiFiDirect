@@ -66,4 +66,13 @@
         android:layout_above="@+id/numberPicker"
         android:layout_alignStart="@+id/buttonC"
         android:text="TextView" />
+
+    <Button
+        android:id="@+id/buttonCsP"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="29dp"
+        android:text="Client-send Pic"
+        android:layout_above="@+id/button2"
+        android:layout_toStartOf="@+id/numberPicker" />
 </RelativeLayout>
