@@ -17,7 +17,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.NumberPicker;
 import android.widget.TextView;
-import android.widget.Toast;
+import com.example.afsahulsyed.wifid3.ClientService;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
                 info = mInfo;
                 TextView view = (TextView) findViewById(R.id.textView);
                 if (info.groupFormed && info.isGroupOwner) {
-                    Log.d(TAG, "owner start");
+                    Log.d(TAG, "Group formed and you are the owner");
 
                    // mServerTask = new FileServerAsyncTask(MainActivity.this, view);
                    // mServerTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
 
                 } else if (info.groupFormed) {
                     SetButtonVisible();
-                    Log.d(TAG,"group Formed");
+                    Log.d(TAG,"group Formed & you are not the owner");
                 }
             }
         };

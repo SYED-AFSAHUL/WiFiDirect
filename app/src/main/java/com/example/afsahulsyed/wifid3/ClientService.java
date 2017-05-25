@@ -1,9 +1,7 @@
 package com.example.afsahulsyed.wifid3;
 
 import android.app.IntentService;
-import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.FileNotFoundException;
@@ -35,6 +33,9 @@ public class ClientService extends IntentService {
         Log.d(TAG,"ClientService");
     }
 
+    public ClientService(){
+        super("ClientService");
+    }
     @Override
     protected void onHandleIntent(Intent intent) {
         Log.d(TAG,"onHandleIntent");
@@ -67,6 +68,7 @@ public class ClientService extends IntentService {
            // }
             outputStream.close();
            // inputStream.close();
+            Log.d(TAG,"Transmission on client side is done");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             //catch logic
@@ -82,10 +84,12 @@ public class ClientService extends IntentService {
  * transferring or if an exception occurred.
  */
         finally {
+            Log.d(TAG,"in finally clientService");
             if (socket != null) {
                 if (socket.isConnected()) {
                     try {
                         socket.close();
+                        Log.d(TAG,"Socket closed");
                     } catch (IOException e) {
                         e.printStackTrace();
                         //catch logic

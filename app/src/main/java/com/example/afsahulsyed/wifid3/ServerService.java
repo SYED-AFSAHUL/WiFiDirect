@@ -33,12 +33,14 @@ public class ServerService extends AsyncTask<Void, Void, String> {
     protected String doInBackground(Void... params) {
         try {
             Log.d(TAG,"doInBackground");
+            Log.d(TAG,"Waiting for client......");
             /**
              * Create a server socket and wait for client connections. This
              * call blocks until a connection is accepted from a client
              */
             ServerSocket serverSocket = new ServerSocket(8888);
             Socket client = serverSocket.accept();
+            Log.d(TAG,"connection accepted");
 
             /**
              * If this code is reached, a client has connected and transferred data
@@ -55,6 +57,7 @@ public class ServerService extends AsyncTask<Void, Void, String> {
             InputStream inputstream = client.getInputStream();
             //copyFile(inputstream, new FileOutputStream(f));
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            Log.d(TAG,"baos -: "+ baos);
             int i;
             while ((i = inputstream.read()) != -1) {
                 baos.write(i);
@@ -63,6 +66,7 @@ public class ServerService extends AsyncTask<Void, Void, String> {
             String str = baos.toString();
             serverSocket.close();
             //return f.getAbsolutePath();
+            Log.d(TAG, "result string "+ str);
             return str;
         } catch (IOException e) {
            // Log.e(WiFiDirectActivity.TAG, e.getMessage());
@@ -76,6 +80,7 @@ public class ServerService extends AsyncTask<Void, Void, String> {
      */
     @Override
     protected void onPostExecute(String result) {
+        Log.d(TAG,"onPostExecute");
         Toast.makeText(context, "result"+result, Toast.LENGTH_SHORT).show();
 
         if (result != null) {
