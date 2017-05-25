@@ -2,6 +2,7 @@ package com.example.afsahulsyed.wifid3;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,16 +21,18 @@ public class ServerService extends AsyncTask<Void, Void, String> {
 
     private Context context;
     private TextView statusText;
+    private static final String TAG = "sMess";
 
     public ServerService(Context context, View statusText) {
         this.context = context;
         this.statusText = (TextView) statusText;
+        Log.d(TAG,"ServerService");
     }
 
     @Override
     protected String doInBackground(Void... params) {
         try {
-
+            Log.d(TAG,"doInBackground");
             /**
              * Create a server socket and wait for client connections. This
              * call blocks until a connection is accepted from a client

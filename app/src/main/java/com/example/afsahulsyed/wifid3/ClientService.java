@@ -4,6 +4,7 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -22,6 +23,8 @@ public class ClientService extends IntentService {
     public static final String EXTRAS_GROUP_OWNER_ADDRESS = "sd_go_host";
     public static final String EXTRAS_GROUP_OWNER_PORT = "sd_go_port";
 
+    private static final String TAG = "sMess";
+
     /**
      * Creates an IntentService.  Invoked by your subclass's constructor.
      *
@@ -29,10 +32,12 @@ public class ClientService extends IntentService {
      */
     public ClientService(String name) {
         super(name);
+        Log.d(TAG,"ClientService");
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        Log.d(TAG,"onHandleIntent");
        // Context context = this.getApplicationContext();
         String host = intent.getExtras().getString(EXTRAS_GROUP_OWNER_ADDRESS);
         int port = intent.getExtras().getInt(EXTRAS_GROUP_OWNER_PORT);
@@ -63,8 +68,10 @@ public class ClientService extends IntentService {
             outputStream.close();
            // inputStream.close();
         } catch (FileNotFoundException e) {
+            e.printStackTrace();
             //catch logic
         } catch (IOException e) {
+            e.printStackTrace();
             //catch logic
         } catch (Exception e){
             e.printStackTrace();
@@ -80,6 +87,7 @@ public class ClientService extends IntentService {
                     try {
                         socket.close();
                     } catch (IOException e) {
+                        e.printStackTrace();
                         //catch logic
                     }
                 }

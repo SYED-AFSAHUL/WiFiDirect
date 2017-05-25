@@ -17,7 +17,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.NumberPicker;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -80,6 +82,17 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG,"initReceiver");
         mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         mChannel = mManager.initialize(this, getMainLooper(), null);
+
+        /*try {
+            Method method1 = mManager.getClass().getMethod("enableP2p", WifiP2pManager.Channel.class);
+            method1.invoke(mManager, mChannel);
+            //Toast.makeText(getActivity(), "method found",
+            //       Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(getApplicationContext(), "method did not found",
+               Toast.LENGTH_SHORT).show();
+             e.printStackTrace();
+        }*/
 
         WifiP2pManager.PeerListListener mPeerListListener = new WifiP2pManager.PeerListListener() {
             @Override
@@ -152,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Log.d(TAG,"connectBT clicked");
-                int no = deviceNoNP.getValue();
+                int no = deviceNoNP.getValue() - 1 ;
                 mDevice = (WifiP2pDevice) peers.get(no);
                 CreateConnect(mDevice);
             }
@@ -160,7 +173,6 @@ public class MainActivity extends AppCompatActivity {
 
         //Client
         sendDataBT.setOnClickListener(new View.OnClickListener(){
-
             @Override
             public void onClick(View v) {
                 Log.d(TAG,"sendDataBT clicked");
@@ -171,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
 
                 serviceIntent.putExtra(ClientService.EXTRAS_GROUP_OWNER_ADDRESS,
                         info.groupOwnerAddress.getHostAddress());
-                Log.i(TAG, "owenerip is " + info.groupOwnerAddress.getHostAddress());
+                Log.i(TAG, "ownership is " + info.groupOwnerAddress.getHostAddress());
                 serviceIntent.putExtra(ClientService.EXTRAS_GROUP_OWNER_PORT,
                         8888);
                 MainActivity.this.startService(serviceIntent);
@@ -188,11 +200,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailure(int reasonCode) {
                 Log.d(TAG,"DiscoverPeers Fail");
+                Log.d(TAG, String.valueOf(reasonCode));
             }
         });
     }
 
     private void CreateConnect(WifiP2pDevice device) {
+        Log.d(TAG,"CreateConnect");
         WifiP2pConfig config = new WifiP2pConfig();
 
         config.deviceAddress = device.deviceAddress;
@@ -201,12 +215,14 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onSuccess() {
+                Log.d(TAG,"Success");
             }
-
             @Override
             public void onFailure(int reason) {
+                Log.d(TAG,"Failure" + reason + "  ");
             }
         });
+        Log.d(TAG,"exiting CreateConnection");
     }
 
 
@@ -216,11 +232,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         registerReceiver(mReceiver, mIntentFilter);
+        Log.d(TAG,"onResume");
     }
     /* unregister the broadcast receiver */
     @Override
     protected void onPause() {
         super.onPause();
         unregisterReceiver(mReceiver);
+        Log.d(TAG,"onPause");
     }
 }
