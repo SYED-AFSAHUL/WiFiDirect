@@ -14,7 +14,7 @@
         tools:layout_editor_absoluteX="21dp"
         tools:layout_editor_absoluteY="96dp"
         tools:ignore="MissingConstraints"
-        android:layout_marginTop="29dp"
+        android:layout_marginTop="22dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
