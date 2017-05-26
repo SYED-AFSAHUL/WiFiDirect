@@ -42,29 +42,58 @@ public class ServerFiles extends AsyncTask<Void, Void, String> {
         Log.d(TAG,"doInBackground- serverfiles");
         try {
 
+            Log.d(TAG,"waiting to accept connection.....");
             /**
              * Create a server socket and wait for client connections. This
              * call blocks until a connection is accepted from a client
              */
-            ServerSocket serverSocket = new ServerSocket(8888);
+            ServerSocket serverSocket = new ServerSocket(8988);
             Socket client = serverSocket.accept();
             Log.d(TAG,"Connection Accepted");
             /**
              * If this code is reached, a client has connected and transferred data
              * Save the input stream from the client as a JPEG file
              */
-            final File f = new File(Environment.getExternalStorageDirectory() + "/"
-                    + context.getPackageName() + "/wifip2pshared-" + System.currentTimeMillis()
-                    + ".jpg");
+            /*final File f = new File(context.getFilesDir(),
+                    "wifip2pshared-" + System.currentTimeMillis()
+                            + ".jpg");*/
+            /*final File f = new File("/storage/emulated/0/wifid3/",
+                    "wifip2pshared-" + System.currentTimeMillis() + ".jpg");*/
+
+           /* final File f = new File(
+                    Environment.getExternalStorageDirectory() + "/"
+                            + "com.example" + "/wifip2pshared-"
+                            + System.currentTimeMillis() + ".jpg");*/
+            //final File folder = new File(Environment.getExternalStoragePublicDirectory(Environme‌​nt.DIRECTORY_PICTURE‌​S) + "/Whatever/");
+
+            //File folder = new File(this.getActivity().getExternalFilesDir(null) + IMAGE_DIRECTORY + "whatever you want for your directory name");
+
+            File path = Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_PICTURES);
+            File f = new File(path, "wifip2pshared-" + System.currentTimeMillis()+ ".jpg");
+
 
             File dirs = new File(f.getParent());
-            if (!dirs.exists()) {
-                dirs.mkdirs();
-                Log.d(TAG,"!dirs.exists()");
+            try {
+                if (!dirs.exists()) {
+                    dirs.mkdirs();
+                    Log.d(TAG, "!dirs.exists()");
+                }
+                f.createNewFile();
+            }catch (Exception e){
+                Log.d(TAG,e.getMessage());
             }
-            f.createNewFile();
+            if (f.exists()) {
+                Log.d(TAG, "dir exist");
+            }else{
+                Log.d(TAG, "dir still doesn't exist");
+            }
             InputStream inputstream = client.getInputStream();
-            copyFile(inputstream, new FileOutputStream(f));
+            if(copyFile(inputstream, new FileOutputStream(f))){
+                Log.d(TAG,"successfully copied");
+            } else {
+                Log.d(TAG,"error in coping");
+            }
             serverSocket.close();
             Log.d(TAG,"exiting doInBackGround");
             return f.getAbsolutePath();
@@ -81,12 +110,18 @@ public class ServerFiles extends AsyncTask<Void, Void, String> {
     @Override
     protected void onPostExecute(String result) {
         Log.d(TAG,"onPostExecute");
-        if (result != null) {
-            statusText.setText("File copied - " + result);
-            Intent intent = new Intent();
-            intent.setAction(android.content.Intent.ACTION_VIEW);
-            intent.setDataAndType(Uri.parse("file://" + result), "image/*");
-            context.startActivity(intent);
+        try {
+            if (result != null) {
+                statusText.setText("File copied - " + result);
+                Log.d(TAG,"location --- "+ result);
+                Intent intent = new Intent();
+                intent.setAction(android.content.Intent.ACTION_VIEW);
+                intent.setDataAndType(Uri.parse("file://" + result), "image/*");
+                context.startActivity(intent);
+            }
+        }catch (Exception e){
+            Log.d(TAG,e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -102,6 +137,7 @@ public class ServerFiles extends AsyncTask<Void, Void, String> {
             inputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
+            Log.d(TAG,e.getMessage());
             return false;
         }
         return true;

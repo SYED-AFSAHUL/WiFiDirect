@@ -135,8 +135,8 @@ public class MainActivity extends AppCompatActivity {
                     mServerFiles = new ServerFiles(MainActivity.this, view);
                     mServerFiles.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
-                    mDataTask = new ServerService(getApplicationContext(), view);
-                    mDataTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                   // mDataTask = new ServerService(getApplicationContext(), view);
+                   // mDataTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
                 } else if (info.groupFormed) {
                     SetButtonVisible();
@@ -197,11 +197,11 @@ public class MainActivity extends AppCompatActivity {
         sendPicBT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                //intent.setType("image/*");
-                //startActivityForResult(intent, 20);
-                sendPicClient();
-
+                Log.d(TAG,"sendPicBT clicked");
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/*");
+                startActivityForResult(intent, 20);
+                //sendPicClient();
             }
         });
     }
@@ -240,24 +240,27 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG,"exiting CreateConnection");
     }
 
-    //@Override
-    //protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-       // if (requestCode == 20) {
-         //   super.onActivityResult(requestCode, resultCode, data);
-           // Uri uri = data.getData();
-    private void sendPicClient(){
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 20) {
+            super.onActivityResult(requestCode, resultCode, data);
+            Uri uri = data.getData();
+            //private void sendPicClient(){
+            Log.d(TAG, "onActivityResult");
+            Log.d(TAG,"uri - "+ uri);
             Intent serviceIntent = new Intent(MainActivity.this,
                     ClientFiles.class);
 
             serviceIntent.setAction(ClientFiles.ACTION_SEND_FILE);
-            //serviceIntent.putExtra(ClientFiles.EXTRAS_FILE_PATH,
-              //      uri.toString());
+            serviceIntent.putExtra(ClientFiles.EXTRAS_FILE_PATH,
+                    uri.toString());
 
             serviceIntent.putExtra(ClientFiles.EXTRAS_GROUP_OWNER_ADDRESS,
                     info.groupOwnerAddress.getHostAddress());
             serviceIntent.putExtra(ClientFiles.EXTRAS_GROUP_OWNER_PORT,
                     8988);
             MainActivity.this.startService(serviceIntent);
+        }
     }
 
 

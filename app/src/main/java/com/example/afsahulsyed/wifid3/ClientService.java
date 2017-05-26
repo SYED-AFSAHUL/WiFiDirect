@@ -64,7 +64,7 @@ public class ClientService extends IntentService {
            // InputStream inputStream = null;
            // inputStream = cr.openInputStream(Uri.parse("path/to/picture.jpg"));
            // while ((len = inputStream.read(buf)) != -1) {
-                outputStream.write("qwertyuiop".getBytes());
+                outputStream.write("LLLLLLLLL88888".getBytes());
            // }
             outputStream.close();
            // inputStream.close();

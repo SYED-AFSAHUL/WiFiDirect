@@ -5,7 +5,6 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.FileNotFoundException;
@@ -22,7 +21,7 @@ import java.net.Socket;
 public class ClientFiles extends IntentService {
 
     private static final String TAG = "sMess";
-    private static final int SOCKET_TIMEOUT = 5000;
+    private static final int SOCKET_TIMEOUT = 50000;
     public static final String ACTION_SEND_FILE = "com.example.android.wifidirect.SEND_FILE";
     public static final String EXTRAS_FILE_PATH = "sf_file_url";
     public static final String EXTRAS_GROUP_OWNER_ADDRESS = "sf_go_host";
@@ -30,7 +29,7 @@ public class ClientFiles extends IntentService {
     byte buf[]  = new byte[1024];
     int len;
     //String filePath = "/storage/emulated/0/WhatsApp/Media/WhatsApp Images/IMG-wifid.jpg";
-    String filePath = "/sdcard/DCIM/m-7.jpg";
+    String filePath = "/Internal/storage/DCIM/m-7.jpg";
 
     public ClientFiles(String name) {
         super(name);
@@ -49,7 +48,7 @@ public class ClientFiles extends IntentService {
         if (intent.getAction().equals(ACTION_SEND_FILE)) {
             Log.d(TAG,"ACTION_SEND_FILE");
 
-            //String fileUri = intent.getExtras().getString(EXTRAS_FILE_PATH);
+            String fileUri = intent.getExtras().getString(EXTRAS_FILE_PATH);
             String host = intent.getExtras().getString(EXTRAS_GROUP_OWNER_ADDRESS);
 
             Socket socket = new Socket();
@@ -57,6 +56,10 @@ public class ClientFiles extends IntentService {
             int port = intent.getExtras().getInt(EXTRAS_GROUP_OWNER_PORT);
 
             try {
+                if(socket.isConnected()) {
+                    socket.close();
+                    Log.d(TAG, "Socket was connected, now closed");
+                }
                 /**
                  * Create a client socket with the host,
                  * port, and timeout information.
@@ -64,6 +67,7 @@ public class ClientFiles extends IntentService {
                 socket.bind(null);
                 socket.connect((new InetSocketAddress(host, port)), SOCKET_TIMEOUT);
 
+                Log.d(TAG,"Sending pic started.....");
                 /**
                  * Create a byte stream from a JPEG file and pipe it to the output stream
                  * of the socket. This data will be retrieved by the server device.
@@ -71,18 +75,21 @@ public class ClientFiles extends IntentService {
                 OutputStream outputStream = socket.getOutputStream();
                 ContentResolver cr = context.getContentResolver();
                 InputStream inputStream = null;
-                inputStream = cr.openInputStream(Uri.parse(filePath));//("path/to/picture.jpg"));
+                inputStream = cr.openInputStream(Uri.parse(fileUri));//("path/to/picture.jpg"));
                 while ((len = inputStream.read(buf)) != -1) {
                     outputStream.write(buf, 0, len);
                 }
+                Log.d(TAG,"Sending pic Finished.");
                 outputStream.close();
                 inputStream.close();
             } catch (FileNotFoundException e) {
                 //catch logic
                 e.printStackTrace();
+                Log.d(TAG, (" FileNotFoundException - " + e.getMessage()));
             } catch (IOException e) {
                 //catch logic
                 e.printStackTrace();
+                Log.d(TAG,"IOException " + e.getMessage());
             }
 
             /**
@@ -97,6 +104,7 @@ public class ClientFiles extends IntentService {
                             socket.close();
                         } catch (IOException e) {
                             e.printStackTrace();
+                            Log.d(TAG,e.getMessage());
                             //catch logic
                         }
                     }
