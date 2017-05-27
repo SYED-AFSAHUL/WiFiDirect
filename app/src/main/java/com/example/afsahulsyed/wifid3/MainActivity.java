@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     Button sendDataBT;
     Button receiveDataBT;
     Button sendPicBT;
+    Button sendMusBT;
     NumberPicker deviceNoNP;
 
     private List peers = new ArrayList();
@@ -66,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         sendDataBT = (Button)findViewById(R.id.buttonC);
         receiveDataBT = (Button)findViewById(R.id.buttonS);
         sendPicBT = (Button)findViewById(R.id.buttonCsP);
+        sendMusBT = (Button)findViewById(R.id.buttonCm);
         deviceNoNP = (NumberPicker)findViewById(R.id.numberPicker);
         deviceNoNP.setMinValue(1);
         deviceNoNP.setWrapSelectorWheel(true);
@@ -86,17 +88,6 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG,"initReceiver");
         mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         mChannel = mManager.initialize(this, getMainLooper(), null);
-
-        /*try {
-            Method method1 = mManager.getClass().getMethod("enableP2p", WifiP2pManager.Channel.class);
-            method1.invoke(mManager, mChannel);
-            //Toast.makeText(getActivity(), "method found",
-            //       Toast.LENGTH_SHORT).show();
-        } catch (Exception e) {
-            Toast.makeText(getApplicationContext(), "method did not found",
-               Toast.LENGTH_SHORT).show();
-             e.printStackTrace();
-        }*/
 
         WifiP2pManager.PeerListListener mPeerListListener = new WifiP2pManager.PeerListListener() {
             @Override
@@ -199,9 +190,21 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Log.d(TAG,"sendPicBT clicked");
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("image/*");
+                intent.setType("mp3/*");
                 startActivityForResult(intent, 20);
                 //sendPicClient();
+            }
+        });
+
+        sendMusBT.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG,"sendMusBT");
+
+                Intent mIntentMus = new Intent(Intent.ACTION_GET_CONTENT);
+                mIntentMus.setType("audio/*");
+                //startActivityForResult(Intent.createChooser(intent, getString(R.string.select_audio_file_title)), REQ_CODE_PICK_SOUNDFILE);
+                startActivityForResult(mIntentMus,30);
             }
         });
     }
