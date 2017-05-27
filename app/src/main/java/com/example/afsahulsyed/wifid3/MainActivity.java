@@ -190,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Log.d(TAG,"sendPicBT clicked");
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("mp3/*");
+                intent.setType("image/*");
                 startActivityForResult(intent, 20);
                 //sendPicClient();
             }
