@@ -203,6 +203,7 @@ public class MainActivity extends AppCompatActivity {
 
                 Intent mIntentMus = new Intent(Intent.ACTION_GET_CONTENT);
                 mIntentMus.setType("audio/*");
+
                 //startActivityForResult(Intent.createChooser(intent, getString(R.string.select_audio_file_title)), REQ_CODE_PICK_SOUNDFILE);
                 startActivityForResult(mIntentMus,30);
             }
